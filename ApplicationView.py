@@ -10,6 +10,7 @@ last edited: May 2017
 
 import sys
 import SubsceneSearch
+import languages
 import utils
 from PySide.QtCore import *
 from PySide.QtGui import *
@@ -23,8 +24,28 @@ class ApplicationView(QWidget):
         
     def initUI(self):
         style = """
+            QWidget{
+                background: #25282D;
+                color: #8D9DA4;
+            } 
             QPushButton{
-                color: rgb(230, 116, 44); 
+                background: #3F464B;
+                border: solid 1px #202429;
+                padding: 10px 40px; 
+            }
+            QPushButton:hover:!pressed{
+                background: #616B74;
+            }
+            QPushButton:!enabled{
+                background: #A0A8AF;
+            }
+            QLineEdit, QComboBox{
+                border: solid 1px #1E2226;
+                background: #1A1D21;
+                padding: 5px 5px;
+            }
+            QLineEdit:hover:!pressed{
+                background: #616B74;
             }
             QListWidgetItem{color: rgb(0, 0, 0); }
             """
@@ -39,8 +60,8 @@ class ApplicationView(QWidget):
         formLayout = QFormLayout()
 
         self.cmbLanguage = QComboBox()
-        languages = ['English', 'Arabic','Yoruba']
-        self.cmbLanguage.addItems(languages)
+        self.cmbLanguage.addItems(languages.supported)
+        self.cmbLanguage.c
 
         self.txtTitle = QLineEdit('mother india')
         self.txtSeason = QLineEdit('')
@@ -90,7 +111,7 @@ class ApplicationView(QWidget):
         url = utils.string_to_query(self.txtTitle.text())
         self.statusMessage.setText('Query string: '+ url)
         self.searchResult = SubsceneSearch.search_movie_subtitle(url)
-        self.statusMessage.setText(str(len(self.searchResult)) + ' result(s) found')
+        self.statusMessage.setText(str(len(self.searchResult)) + ' result(s) found . Double click to show available subtitle for selected movie')
         self.resultList.clear()
         #self.resultList.addItems(self.searchResult)
         # loop through the list of movies and add the titles to the result list 
