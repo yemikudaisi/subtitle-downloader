@@ -177,6 +177,10 @@ class ApplicationView(QWidget):
         self.changeResultTpe(ResultTypes.MOVIE)
 
     def searchSelectionSubtitles(self):
+        if len(self.searchResult) < 1:
+            self.resetButton()
+            return
+
         movie = self.searchResult[self.resultList.currentRow()]
         self.searchResult =  SubsceneSearch.search_movie_subtitle(movie, languages.supported[self.selectedLanguage])
         self.statusMessage.setText(str(len(self.searchResult)) + ' result(s) found . Select a subtitle and click download selection.')
@@ -185,13 +189,19 @@ class ApplicationView(QWidget):
         # loop through the list of subtitle and add the titles to the result list 
         for subtitle in self.searchResult:
             self.resultList.addItem(subtitle.title)
-        self.changeResultTpe(ResultTypes.SUBTITLE)
+        self.changeResultTpe(ResultTypes.SUBTITLE)  
 
+    def downloadSelectionSubtitle(self):
+        if len(self.searchResult) < 1:
+            self.resetButton()
+            return
+
+        subtitle = self.searchResult[self.resultList.currentRow()]
+        result = SubsceneSearch.download_movie_subtitle(subtitle)
+
+    
     def languageChanged(self,i):
         self.selectedLanguage = i
 
     def resultListItemClicked(self, item):
-        self.resetButton()    
-
-    def downloadSelectionSubtitle(self):
-        print("downloading...")
+        self.resetButton()  

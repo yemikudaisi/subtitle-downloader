@@ -1,4 +1,5 @@
-﻿import bs4
+﻿import urllib
+import bs4
 import requests
 from movie import Movie
 from subtitle import Subtitle
@@ -6,10 +7,10 @@ from subtitle import Subtitle
 def search_movie(url_name):
     
     url = 'https://subscene.com/subtitles/title?q='+url_name
-    result = requests.get(url)
-    result.raise_for_status()
-    soup = bs4.BeautifulSoup(result.text,"html.parser")
-
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = bs4.BeautifulSoup(response.text,"html.parser")
+    del response
     movies = []
     for div in soup.findAll('div', attrs={'class':'title'}):
         temp = Movie(div.find('a').contents[0],div.find('a')['href'])
@@ -23,10 +24,10 @@ if language has not been set the movie class will return english (which is the d
 """
 def search_movie_subtitle(movie, language):
     url = 'https://subscene.com/subtitles/'+movie.slug()+'/'+language
-    print(url)
-    result = requests.get(url)
-    result.raise_for_status()
-    soup = bs4.BeautifulSoup(result.text,"html.parser")
+    response = requests.get(url)
+    response.raise_for_status()
+    soup = bs4.BeautifulSoup(response.text,"html.parser")
+    del response
     subtitles = []
     selection =soup.findAll('td', attrs={'class':'a1'})
     for td in selection:
@@ -36,5 +37,19 @@ def search_movie_subtitle(movie, language):
         temp = Subtitle(title,url, lang)
         subtitles.append(temp)
     return subtitles
+
+def download_movie_subtitle(subtitle):
+    response = requests.get('https://subscene.com/'+subtitle.link)
+    soup = bs4.BeautifulSoup(response.text,'html.parser')
+    del response
+    selection = soup.findAll('div', attrs={'class' : 'download'})
+    for div in selection:
+        # TODO Check for errors
+        url = "http://subscene.com"+div.find('a')['href']
+        print(url)
+        urllib.urlretrieve(url, "file.zip")
+
+    print("complete: "+str(len(selection))+" downloaded")
+
     
 
