@@ -12,9 +12,14 @@ import sys
 import SubsceneSearch
 import languages
 import utils
+from enum import Enum
 from PySide.QtCore import *
 from PySide.QtGui import *
 from PySide.QtDeclarative import QDeclarativeView
+
+class ResultTypes(Enum):
+    MOVIE = 1
+    SUBTITLE = 2
 
 class ApplicationView(QWidget):
     
@@ -38,6 +43,7 @@ class ApplicationView(QWidget):
             }
             QPushButton:!enabled{
                 background: #A0A8AF;
+                color: #25282D;
             }
             QLineEdit, QComboBox{
                 border: solid 1px #1E2226;
@@ -48,10 +54,33 @@ class ApplicationView(QWidget):
                 background: #616B74;
             }
             QListWidgetItem{color: rgb(0, 0, 0); }
+            QComboBox::drop-down
+            {
+                subcontrol-origin: padding;
+                subcontrol-position: top right;
+                width: 15px;
+
+                border-left-width: 0px;
+                border-left-color: darkgray;
+                border-left-style: solid;
+                border-top-right-radius: 3px;
+                border-bottom-right-radius: 3px;
+            }
+
+            QComboBox::down-arrow
+            {
+                image: url(:/qss_icons/rc/down_arrow_disabled.png);
+            }
+
+            QComboBox::down-arrow:on, QComboBox::down-arrow:hover,
+            QComboBox::down-arrow:focus
+            {
+                image: url(:/qss_icons/rc/down_arrow.png);
+            }
             """
 
         self.setStyleSheet(style)
-        self.setWindowTitle('Subtitle Downloader')  
+        self.setWindowTitle('Subtitle Search')  
         self.statusBar = QStatusBar()
         self.statusMessage = QLabel('Ready')
         self.statusBar.addWidget(self.statusMessage)
@@ -61,7 +90,7 @@ class ApplicationView(QWidget):
 
         self.cmbLanguage = QComboBox()
         self.cmbLanguage.addItems(languages.supported)
-        self.cmbLanguage.c
+        self.cmbLanguage.currentIndexChanged.connect(self.languageChanged)
 
         self.txtTitle = QLineEdit('mother india')
         self.txtSeason = QLineEdit('')
@@ -78,11 +107,15 @@ class ApplicationView(QWidget):
         self.resultList = QListWidget();
         self.resultList.itemClicked.connect(self.resultListItemClicked)
 
-        self.btnDownload = QPushButton("Dowload Selection")
+        self.btnDownloadSubtitle = QPushButton("Dowload Selection")
+        self.btnShowSubtitles = QPushButton("Show subtitles for Selection")
+        self.btnDownloadSubtitle.setDisabled(True)
+        self.btnShowSubtitles.setDisabled(True)
         self.btnClose = QPushButton("Close")
 
         hlayout = QHBoxLayout()
-        hlayout.addWidget(self.btnDownload)
+        hlayout.addWidget(self.btnShowSubtitles)
+        hlayout.addWidget(self.btnDownloadSubtitle)
         hlayout.addWidget(self.btnClose)
                  
         mainLayout.addLayout(formLayout, 1, 0)
@@ -106,7 +139,11 @@ class ApplicationView(QWidget):
         else:
             # This works on Mac/Linux
             os.system("kill -9 %d" % os.getpid())
-            
+    
+    def changeResultTpe(self, type):
+        self.resultType = type
+
+              
     def searchSubtitle(self):
         url = utils.string_to_query(self.txtTitle.text())
         self.statusMessage.setText('Query string: '+ url)
@@ -116,7 +153,21 @@ class ApplicationView(QWidget):
         #self.resultList.addItems(self.searchResult)
         # loop through the list of movies and add the titles to the result list 
         for movie in self.searchResult:
+            print(movie.link)
+            print(movie.slug())
             self.resultList.addItem(movie.title)
+        self.changeResultTpe(ResultTypes.MOVIE)
+
+    def languageChanged(self,i):
+        QMessageBox.information(self, "Language Selection", "Language: "+ str(i))
 
     def resultListItemClicked(self, item):
-       QMessageBox.information(self, "ListWidget", "You selected: "+item.text())
+        if len(self.resultList.items()) > 0:
+            if self.resultType == ResultTypes.MOVIE:
+                self.btnShowSubtitles.isEnabled()
+                self.btnDownloadSubtitle.setDisabled(True)
+
+            if self.resultType == ResultTypes.SUBTITLE:
+                self.btnShowSubtitles.setDisabled(True)
+                self.btnDownloadSubtitle.isEnabled()
+        QMessageBox.information(self, "Movie Selection", "You selected: "+item.text())
