@@ -10,6 +10,7 @@ last edited: May 2017
 
 import sys
 import SubsceneSearch
+from movie import Movie
 import languages
 import utils
 from enum import Enum
@@ -25,6 +26,7 @@ class ApplicationView(QWidget):
     
     def __init__(self):
         super(ApplicationView, self).__init__()
+        self.selectedLanguage = 0
         self.initUI()
         
     def initUI(self):
@@ -43,7 +45,7 @@ class ApplicationView(QWidget):
             }
             QPushButton:!enabled{
                 background: #A0A8AF;
-                color: #25282D;
+                color: #5A636B;
             }
             QLineEdit, QComboBox{
                 border: solid 1px #1E2226;
@@ -102,13 +104,15 @@ class ApplicationView(QWidget):
         formLayout.addRow(self.tr('Episode (series)'), self.txtEpisode)
 
         btnSearch = QPushButton('Search', self)
-        btnSearch.clicked.connect(self.searchSubtitle)
+        btnSearch.clicked.connect(self.searchMovie)
 
         self.resultList = QListWidget();
         self.resultList.itemClicked.connect(self.resultListItemClicked)
 
         self.btnDownloadSubtitle = QPushButton("Dowload Selection")
+        self.btnDownloadSubtitle.clicked.connect(self.downloadSelectionSubtitle)
         self.btnShowSubtitles = QPushButton("Show subtitles for Selection")
+        self.btnShowSubtitles.clicked.connect(self.searchSelectionSubtitles)
         self.btnDownloadSubtitle.setDisabled(True)
         self.btnShowSubtitles.setDisabled(True)
         self.btnClose = QPushButton("Close")
@@ -142,32 +146,52 @@ class ApplicationView(QWidget):
     
     def changeResultTpe(self, type):
         self.resultType = type
+        self.resetButton();
 
+    def resetButton(self):
+        if len(self.searchResult) < 1:
+            self.btnShowSubtitles.setDisabled(True)
+            self.btnDownloadSubtitle.setDisabled(True)
+            return
+
+        if self.resultType == ResultTypes.MOVIE:
+            self.btnShowSubtitles.setDisabled(False)
+            self.btnDownloadSubtitle.setDisabled(True)
+            return
+
+        if self.resultType == ResultTypes.SUBTITLE:
+            self.btnShowSubtitles.setDisabled(True)
+            self.btnDownloadSubtitle.setDisabled(False)
+            return
               
-    def searchSubtitle(self):
+    def searchMovie(self):
+        self.searchResult = []
         url = utils.string_to_query(self.txtTitle.text())
-        self.statusMessage.setText('Query string: '+ url)
-        self.searchResult = SubsceneSearch.search_movie_subtitle(url)
-        self.statusMessage.setText(str(len(self.searchResult)) + ' result(s) found . Double click to show available subtitle for selected movie')
+        self.searchResult = SubsceneSearch.search_movie(url)
+        self.statusMessage.setText(str(len(self.searchResult)) + ' result(s) found . Select a movie and click show selection subtitles.')
         self.resultList.clear()
-        #self.resultList.addItems(self.searchResult)
+
         # loop through the list of movies and add the titles to the result list 
         for movie in self.searchResult:
-            print(movie.link)
-            print(movie.slug())
             self.resultList.addItem(movie.title)
         self.changeResultTpe(ResultTypes.MOVIE)
 
+    def searchSelectionSubtitles(self):
+        movie = self.searchResult[self.resultList.currentRow()]
+        self.searchResult =  SubsceneSearch.search_movie_subtitle(movie, languages.supported[self.selectedLanguage])
+        self.statusMessage.setText(str(len(self.searchResult)) + ' result(s) found . Select a subtitle and click download selection.')
+        self.resultList.clear()
+
+        # loop through the list of subtitle and add the titles to the result list 
+        for subtitle in self.searchResult:
+            self.resultList.addItem(subtitle.title)
+        self.changeResultTpe(ResultTypes.SUBTITLE)
+
     def languageChanged(self,i):
-        QMessageBox.information(self, "Language Selection", "Language: "+ str(i))
+        self.selectedLanguage = i
 
     def resultListItemClicked(self, item):
-        if len(self.resultList.items()) > 0:
-            if self.resultType == ResultTypes.MOVIE:
-                self.btnShowSubtitles.isEnabled()
-                self.btnDownloadSubtitle.setDisabled(True)
+        self.resetButton()    
 
-            if self.resultType == ResultTypes.SUBTITLE:
-                self.btnShowSubtitles.setDisabled(True)
-                self.btnDownloadSubtitle.isEnabled()
-        QMessageBox.information(self, "Movie Selection", "You selected: "+item.text())
+    def downloadSelectionSubtitle(self):
+        print("downloading...")
