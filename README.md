@@ -2,8 +2,17 @@
 
 A GUI application for searching subtitles for movies/TV show by web scrapping.
 
+## Installation
+To install the script clone the repository and run the script
+```
+> git clone https://github.com/yemikudaisi/subtitle-search.git
+> cd subtitle-search
+> python subtitle_search.py
+```
 ## How to use
-Simple clone the project and run the application.
++ Enter the movie title
++ click the search button
++ double click on list items from the result till the subtitle starts to download
 
 ## Issue Reporting
 
