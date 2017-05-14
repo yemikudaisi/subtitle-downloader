@@ -2,6 +2,11 @@
 
 A GUI application for searching subtitles for movies/TV show by web scrapping.
 
+## Dependencies
++ [Beautifulsoup](https://pypi.python.org/pypi/BeautifulSoup)
++ [Request](https://pypi.python.org/pypi/requests)
++ [PySide](https://pypi.python.org/pypi/PySide)
+
 ## Installation
 To install the script clone the repository and run the script
 ```
