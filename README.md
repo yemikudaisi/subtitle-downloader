@@ -18,8 +18,13 @@ To install the script clone the repository and run the script
 ```
 ## How to use
 + Enter the movie title
-+ click the search button
-+ double click on list items from the result till the subtitle starts to download
++ Select a language
++ Click on search
++ At this point, the app will return a list of movies
++ Select a movie from the list and click on the show subtitle for selection button (this will fetch a list of subtitles specific to the selected language and movie)
++ Select one subtitle from the list and click on the download selection button
++ A save as dialog, choose a location and click ok
++ The required file will then be downloaded and saved to the specified location
 
 ## Issue Reporting
 
