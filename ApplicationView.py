@@ -128,17 +128,6 @@ class ApplicationView(QWidget):
          
         self.setGeometry(300, 300, 550, 450)           
         self.show()
-
-    def close(self):
-        # sys.exit(0) is not working because of some interpreter lock or timer issues on exit.
- 
-        # Force kill instead.
-        if sys.platform == "win32":
-            # This works on Windows
-            os.kill(os.getpid(), -9)
-        else:
-            # This works on Mac/Linux
-            os.system("kill -9 %d" % os.getpid())
     
     def changeResultTpe(self, type):
         self.resultType = type
@@ -195,8 +184,7 @@ class ApplicationView(QWidget):
         subtitle = self.searchResult[self.resultList.currentRow()]
         filePath = QFileDialog.getSaveFileName(self, 'Save File')
         result = SubsceneSearch.download_movie_subtitle(subtitle, filePath[0])
-
-    
+            
     def languageChanged(self,i):
         self.selectedLanguage = i
 
