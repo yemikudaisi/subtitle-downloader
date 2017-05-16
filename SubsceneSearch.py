@@ -3,6 +3,7 @@ import bs4
 import requests
 from movie import Movie
 from subtitle import Subtitle
+from download_manager import download_file
 
 def search_movie(url_name):
     
@@ -38,7 +39,7 @@ def search_movie_subtitle(movie, language):
         subtitles.append(temp)
     return subtitles
 
-def download_movie_subtitle(subtitle):
+def download_movie_subtitle(subtitle, download_path):
     response = requests.get('https://subscene.com/'+subtitle.link)
     soup = bs4.BeautifulSoup(response.text,'html.parser')
     del response
@@ -47,7 +48,7 @@ def download_movie_subtitle(subtitle):
         # TODO Check for errors
         url = "http://subscene.com"+div.find('a')['href']
         print(url)
-        urllib.urlretrieve(url, "file.zip")
+        download_file(url, download_path[0]+".zip")
 
     print("complete: "+str(len(selection))+" downloaded")
 
