@@ -95,13 +95,9 @@ class ApplicationView(QWidget):
         self.cmbLanguage.currentIndexChanged.connect(self.languageChanged)
 
         self.txtTitle = QLineEdit('mother india')
-        self.txtSeason = QLineEdit('')
-        self.txtEpisode = QLineEdit('')
 
         formLayout.addRow(self.tr('Subtitle Language'), self.cmbLanguage)
         formLayout.addRow(self.tr('Title'), self.txtTitle)
-        formLayout.addRow(self.tr('Season (series)'), self.txtSeason)
-        formLayout.addRow(self.tr('Episode (series)'), self.txtEpisode)
 
         btnSearch = QPushButton('Search', self)
         btnSearch.clicked.connect(self.searchMovie)
