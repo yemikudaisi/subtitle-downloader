@@ -198,7 +198,7 @@ class ApplicationView(QWidget):
 
         subtitle = self.searchResult[self.resultList.currentRow()]
         filePath = QFileDialog.getSaveFileName(self, 'Save File')
-        result = SubsceneSearch.download_movie_subtitle(subtitle, filePath)
+        result = SubsceneSearch.download_movie_subtitle(subtitle, filePath[0])
 
     
     def languageChanged(self,i):
