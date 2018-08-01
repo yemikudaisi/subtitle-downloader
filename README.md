@@ -1,6 +1,6 @@
-# subtitle-search
+# Subtitle Downloader
 
-A GUI application for searching subtitles for movies/TV show by web scrapping.
+A GUI application for downloading subtitles for movies/TV show by web scrapping from +[Opensubtitles](opensubtitles.org).
 
 ![App Screenshot](images/Capture.PNG "Screenshot")
 
